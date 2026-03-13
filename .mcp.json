@@ -1,0 +1,17 @@
+{
+	"mcpServers": {
+		"Context7": {
+			"command": "npx",
+			"args": [
+				"-y",
+				"@upstash/context7-mcp",
+				"--api-key",
+				"ctx7sk-3499409d-80f3-4406-aaee-efab3f2bbf81"
+			]
+		},
+		"chrome-devtools": {
+			"command": "npx",
+			"args": [ "-y", "chrome-devtools-mcp@latest" ]
+		}
+	}
+}
