@@ -32,6 +32,9 @@
     "color": {
       "background": false,
       "text": false
+    },
+    "interactivity": {
+      "clientNavigation": true
     }
   }
 }
