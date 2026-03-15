@@ -1,3 +1,6 @@
 *
 !.gitkeep
 !.gitignore
+!wlc-blocks
+node_modules
+vendor

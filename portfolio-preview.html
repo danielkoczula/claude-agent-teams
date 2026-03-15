@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>WLC Portfolio — Case Studies</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    /* ============================================================
+       CSS Custom Properties — mapped 1:1 from Figma tokens
+       ============================================================ */
+    :root {
+      /* Colors */
+      --brand-dark:      #1a1a1a;
+      --brand-primary:   #e3002f;
+      --text-muted:      #666666;
+      --text-main:       #000000;
+      --bg-base:         #ffffff;
+      --bg-card-alt:     #f4f4f4;
+      --border-card:     #e8e8e8;
+      --tag-tech:        #4ee2c0;
+      --tag-category:    #f5e52e;
+
+      /* Spacing */
+      --space-xs:        8px;
+      --space-sm:        16px;
+      --space-md:        24px;
+      --space-xl:        48px;
+
+      /* Typography */
+      --font-primary:       'Montserrat', sans-serif;
+      --font-size-h2:       48px;
+      --font-size-h3:       17px;
+      --font-size-body:     13px;
+      --font-size-tag:      10px;
+      --font-size-link:     12px;
+      --font-size-button:   13px;
+      --font-size-pagination: 14px;
+      --font-size-icon:     20px;
+
+      /* Letter Spacing */
+      --tracking-tight:  -1px;
+      --tracking-button: 0.5px;
+      --tracking-link:   1px;
+      --tracking-tag:    0.8px;
+    }
+
+    /* ============================================================
+       Reset & Base
+       ============================================================ */
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-primary);
+      background: var(--bg-base);
+      color: var(--text-main);
+    }
+
+    /* ============================================================
+       Section
+       ============================================================ */
+    .case-studies {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: var(--space-xl);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-xl);
+    }
+
+    /* ============================================================
+       Heading H2
+       ============================================================ */
+    .case-studies__heading {
+      font-family: var(--font-primary);
+      font-size: var(--font-size-h2);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-tight);
+      line-height: 1;
+      color: var(--brand-dark);
+    }
+
+    .case-studies__heading span {
+      color: var(--brand-primary);
+    }
+
+    /* ============================================================
+       Filters
+       ============================================================ */
+    .filters {
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+    }
+
+    .filters__row {
+      display: flex;
+      align-items: center;
+      gap: var(--space-sm);
+    }
+
+    .filters__label {
+      font-family: var(--font-primary);
+      font-size: var(--font-size-body);
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-tag);
+      color: var(--text-muted);
+      white-space: nowrap;
+      min-width: 120px;
+    }
+
+    .filters__buttons {
+      display: flex;
+      gap: var(--space-sm);
+      flex-wrap: wrap;
+    }
+
+    .filter-btn {
+      font-family: var(--font-primary);
+      font-size: var(--font-size-button);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-button);
+      padding: 0 var(--space-md);
+      height: 36px;
+      border: 2px solid var(--text-main);
+      background: var(--bg-card-alt);
+      color: var(--text-main);
+      cursor: pointer;
+      border-radius: 0;
+    }
+
+    .filter-btn--active {
+      background: var(--brand-primary);
+      border-color: var(--brand-primary);
+      color: var(--bg-base);
+    }
+
+    .filter-btn:hover:not(.filter-btn--active) {
+      background: var(--brand-dark);
+      color: var(--bg-base);
+      border-color: var(--brand-dark);
+    }
+
+    /* ============================================================
+       Divider
+       ============================================================ */
+    .divider {
+      height: 1px;
+      background: var(--border-card);
+    }
+
+    /* ============================================================
+       Cards Grid
+       ============================================================ */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: var(--space-sm);
+    }
+
+    /* ============================================================
+       Card
+       ============================================================ */
+    .card {
+      background: var(--bg-base);
+      border: 1px solid var(--border-card);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card__image {
+      aspect-ratio: 16 / 9;
+      background: linear-gradient(150deg, var(--bg-card-alt) 0%, #dedede 100%);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .card__image-placeholder {
+      font-family: var(--font-primary);
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 1.5px;
+      color: var(--text-muted);
+    }
+
+    .card__body {
+      padding: var(--space-md);
+      display: flex;
+      flex-direction: column;
+      gap: var(--space-sm);
+      flex: 1;
+    }
+
+    /* Tags */
+    .card__tags {
+      display: flex;
+      gap: var(--space-xs);
+      flex-wrap: wrap;
+    }
+
+    .tag {
+      font-family: var(--font-primary);
+      font-size: var(--font-size-tag);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-tag);
+      color: var(--text-main);
+      padding: 4px var(--space-xs);
+      border-radius: 0;
+    }
+
+    .tag--tech     { background: var(--tag-tech); }
+    .tag--category { background: var(--tag-category); }
+
+    /* Title */
+    .card__title {
+      font-family: var(--font-primary);
+      font-size: var(--font-size-h3);
+      font-weight: 700;
+      color: var(--brand-dark);
+      line-height: 1.35;
+    }
+
+    /* Description */
+    .card__description {
+      font-family: var(--font-primary);
+      font-size: var(--font-size-body);
+      font-weight: 400;
+      color: var(--text-muted);
+      line-height: 1.65;
+    }
+
+    /* Read more */
+    .card__link {
+      font-family: var(--font-primary);
+      font-size: var(--font-size-link);
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: var(--tracking-link);
+      color: var(--brand-primary);
+      text-decoration: none;
+      margin-top: auto;
+    }
+
+    .card__link:hover {
+      text-decoration: underline;
+    }
+
+    /* ============================================================
+       Pagination
+       ============================================================ */
+    .pagination {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: var(--space-sm);
+    }
+
+    .pagination__btn {
+      width: 40px;
+      height: 40px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: var(--font-primary);
+      font-weight: 700;
+      font-size: var(--font-size-pagination);
+      border: none;
+      background: var(--bg-card-alt);
+      color: var(--text-main);
+      cursor: pointer;
+      border-radius: 0;
+    }
+
+    .pagination__btn--active {
+      background: var(--brand-primary);
+      color: var(--bg-base);
+    }
+
+    .pagination__arrow {
+      font-size: var(--font-size-icon);
+      background: transparent;
+      color: var(--brand-primary);
+    }
+
+    .pagination__btn:hover:not(.pagination__btn--active) {
+      background: var(--brand-dark);
+      color: var(--bg-base);
+    }
+  </style>
+</head>
+<body>
+
+<section class="case-studies">
+
+  <!-- Heading -->
+  <h2 class="case-studies__heading">Case <span>Studies</span></h2>
+
+  <!-- Filters -->
+  <div class="filters">
+    <div class="filters__row">
+      <span class="filters__label">Kategoria:</span>
+      <div class="filters__buttons">
+        <button class="filter-btn filter-btn--active">Wszystkie</button>
+        <button class="filter-btn">E-commerce</button>
+        <button class="filter-btn">Corporate</button>
+        <button class="filter-btn">B2B</button>
+      </div>
+    </div>
+    <div class="filters__row">
+      <span class="filters__label">Technologia:</span>
+      <div class="filters__buttons">
+        <button class="filter-btn filter-btn--active">Wszystkie</button>
+        <button class="filter-btn">WordPress</button>
+        <button class="filter-btn">WooCommerce</button>
+        <button class="filter-btn">Headless</button>
+        <button class="filter-btn">Performance</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Divider -->
+  <div class="divider"></div>
+
+  <!-- Cards Grid -->
+  <div class="cards-grid">
+
+    <article class="card">
+      <div class="card__image"><span class="card__image-placeholder">16 : 9</span></div>
+      <div class="card__body">
+        <div class="card__tags">
+          <span class="tag tag--tech">WordPress</span>
+          <span class="tag tag--category">E-Commerce</span>
+        </div>
+        <h3 class="card__title">TechStore Premium Redesign</h3>
+        <p class="card__description">Kompleksowa przebudowa sklepu WooCommerce z integracją PIM i optymalizacją Core Web Vitals.</p>
+        <a href="#" class="card__link">Read more →</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card__image"><span class="card__image-placeholder">16 : 9</span></div>
+      <div class="card__body">
+        <div class="card__tags">
+          <span class="tag tag--tech">Headless</span>
+          <span class="tag tag--category">SaaS</span>
+        </div>
+        <h3 class="card__title">FintechHub Platform</h3>
+        <p class="card__description">Headless WordPress + Next.js z wynikiem 98/100 Lighthouse i integracją API płatności.</p>
+        <a href="#" class="card__link">Read more →</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card__image"><span class="card__image-placeholder">16 : 9</span></div>
+      <div class="card__body">
+        <div class="card__tags">
+          <span class="tag tag--tech">WooCommerce</span>
+          <span class="tag tag--category">Fashion</span>
+        </div>
+        <h3 class="card__title">LuxMode Boutique</h3>
+        <p class="card__description">Konfigurator produktów premium z filtrowaniem real-time i podglądem 3D.</p>
+        <a href="#" class="card__link">Read more →</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card__image"><span class="card__image-placeholder">16 : 9</span></div>
+      <div class="card__body">
+        <div class="card__tags">
+          <span class="tag tag--tech">WordPress</span>
+          <span class="tag tag--category">Media</span>
+        </div>
+        <h3 class="card__title">NewsPortal Multi-Site</h3>
+        <p class="card__description">Sieć 12 portali newsowych na WordPress Multisite z CDN i automatyzacją publikacji.</p>
+        <a href="#" class="card__link">Read more →</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card__image"><span class="card__image-placeholder">16 : 9</span></div>
+      <div class="card__body">
+        <div class="card__tags">
+          <span class="tag tag--tech">Headless</span>
+          <span class="tag tag--category">Healthcare</span>
+        </div>
+        <h3 class="card__title">MedClinic Booking System</h3>
+        <p class="card__description">System rezerwacji wizyt z integracją kalendarza i powiadomieniami SMS/email.</p>
+        <a href="#" class="card__link">Read more →</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card__image"><span class="card__image-placeholder">16 : 9</span></div>
+      <div class="card__body">
+        <div class="card__tags">
+          <span class="tag tag--tech">WooCommerce</span>
+          <span class="tag tag--category">B2B</span>
+        </div>
+        <h3 class="card__title">IndustrialPro B2B Portal</h3>
+        <p class="card__description">Platforma B2B z cenami negocjowanymi, zamówieniami hurtowymi i panelem KAM.</p>
+        <a href="#" class="card__link">Read more →</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card__image"><span class="card__image-placeholder">16 : 9</span></div>
+      <div class="card__body">
+        <div class="card__tags">
+          <span class="tag tag--tech">WordPress</span>
+          <span class="tag tag--category">Education</span>
+        </div>
+        <h3 class="card__title">EduLearn Academy</h3>
+        <p class="card__description">Platforma e-learningowa z LifterLMS, certyfikatami cyfrowymi i systemem postępów.</p>
+        <a href="#" class="card__link">Read more →</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card__image"><span class="card__image-placeholder">16 : 9</span></div>
+      <div class="card__body">
+        <div class="card__tags">
+          <span class="tag tag--tech">Headless</span>
+          <span class="tag tag--category">Real Estate</span>
+        </div>
+        <h3 class="card__title">PropFinder Platform</h3>
+        <p class="card__description">Portal nieruchomości z mapą interaktywną, filtrowaniem zaawansowanym i CRM.</p>
+        <a href="#" class="card__link">Read more →</a>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="card__image"><span class="card__image-placeholder">16 : 9</span></div>
+      <div class="card__body">
+        <div class="card__tags">
+          <span class="tag tag--tech">WooCommerce</span>
+          <span class="tag tag--category">Subscription</span>
+        </div>
+        <h3 class="card__title">BoxDelivery Subscription</h3>
+        <p class="card__description">Model subskrypcyjny z personalizowanymi boxami i programem lojalnościowym.</p>
+        <a href="#" class="card__link">Read more →</a>
+      </div>
+    </article>
+
+  </div>
+
+  <!-- Pagination -->
+  <nav class="pagination" aria-label="Paginacja">
+    <button class="pagination__btn pagination__arrow" aria-label="Poprzednia strona">←</button>
+    <button class="pagination__btn pagination__btn--active" aria-current="page">1</button>
+    <button class="pagination__btn">2</button>
+    <button class="pagination__btn">3</button>
+    <button class="pagination__btn">4</button>
+    <button class="pagination__btn">5</button>
+    <button class="pagination__btn pagination__arrow" aria-label="Następna strona">→</button>
+  </nav>
+
+</section>
+
+</body>
+</html>
