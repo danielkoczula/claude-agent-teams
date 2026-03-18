@@ -206,6 +206,47 @@ Rules:
 - Every directive requiring an ID must have a unique one (use `wp_unique_id()`)
 - Wrap interactive root with `data-wp-interactive="wlc/block-name"`
 
+### Interactivity Router
+
+Use `@wordpress/interactivity-router` when the block needs **client-side navigation without a full page reload** — e.g. paginated lists, taxonomy filters, load-more patterns.
+
+```js
+// view.js
+import { store, getContext } from '@wordpress/interactivity';
+import { navigate } from '@wordpress/interactivity-router';
+
+store('wlc/block-name', {
+  actions: {
+    async filter() {
+      const context = getContext();
+      const url = new URL(window.location.href);
+      url.searchParams.set('category', context.selectedCategory);
+      await navigate(url.href);
+    },
+  },
+});
+```
+
+```php
+// render.php — mark the region that gets swapped on navigation
+<section
+  data-wp-interactive="wlc/block-name"
+  data-wp-router-region="wlc-block-name"
+  <?php echo get_block_wrapper_attributes(['class' => 'wlc-block-name']); ?>
+>
+  <!-- content refreshed by router -->
+</section>
+```
+
+When to use the router:
+- Filterable grids / portfolio lists with taxonomy switching
+- Pagination without page reload
+- Any "fetch new server-rendered HTML and swap it in" pattern
+
+When **not** to use the router:
+- Simple show/hide toggles — use `data-wp-bind:hidden` / `data-wp-class` instead
+- Accordion / modal — pure client state, no server round-trip needed
+
 ---
 
 ## Editor Component (edit.js)

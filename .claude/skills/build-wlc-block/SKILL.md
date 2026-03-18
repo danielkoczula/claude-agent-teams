@@ -40,10 +40,19 @@ TeamCreate(team_name: "portfolio-grid-block", description: "Build wlc/block-name
 ```
 This creates the team + shared task list. Teammates will open in split tmux panes automatically (configured in `.claude/settings.json`).
 
+### Step 2.5 — Decide: does this block need the Interactivity Router?
+
+Analyse the design before spawning agents. Use `@wordpress/interactivity-router` (and tell the js-agent and php-agent) **if the block has**:
+- Taxonomy / category filters that swap rendered content
+- Pagination without full page reload
+- Load-more pattern
+
+Skip the router if the block only needs show/hide, accordions, or modals (pure client state — use `data-wp-bind` / `data-wp-class` instead).
+
 ### Step 3 — Create tasks
 Use `TaskCreate` for each parallel workstream (one task per agent):
 - Task 1: PHP backend (plugin bootstrap, CPT, taxonomies, controller, render.php)
-- Task 2: JS frontend (block.json, package.json, index.js, edit.js, view.js)
+- Task 2: JS frontend (block.json, package.json, index.js, edit.js, view.js — include router if decided above)
 - Task 3: CSS + config (style.scss, editor.scss, theme/theme.json)
 
 ### Step 4 — Spawn 3 agents IN A SINGLE MESSAGE (parallel)
