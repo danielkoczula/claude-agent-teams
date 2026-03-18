@@ -2,6 +2,6 @@
   "name": "wlc-agent-teams",
   "private": true,
   "scripts": {
-    "start": "npx @wp-playground/cli@latest server --blueprint=blueprint.json --mount=./plugins:/wordpress/wp-content/plugins"
+    "start": "npx @wp-playground/cli@latest server --blueprint=blueprint.json --mount=./plugins:/wordpress/wp-content/plugins --mount=./theme:/wordpress/wp-content/themes/wlc-theme"
   }
 }

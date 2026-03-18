@@ -29,6 +29,24 @@
 				"blogname": "WLC Blocks Dev",
 				"blogdescription": "WordPress dev environment for WLC blocks"
 			}
-		}
+		},
+		{
+            "step": "mkdir",
+            "path": "/wordpress/wp-content/themes/wlc-theme/templates"
+        },
+        {
+            "step": "writeFile",
+            "path": "/wordpress/wp-content/themes/wlc-theme/style.css",
+            "data": "/*\nTheme Name: WLC Theme\nType: block\n*/"
+        },
+        {
+            "step": "writeFile",
+            "path": "/wordpress/wp-content/themes/wlc-theme/templates/index.html",
+            "data": "<div class=\"wp-block-group\"></div>"
+        },
+        {
+            "step": "activateTheme",
+            "themeFolderName": "wlc-theme"
+        }
 	]
 }

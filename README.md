@@ -36,3 +36,8 @@ composer install
 npm run build   # jednorazowy build
 npm run start   # tryb watch (dev)
 ```
+
+
+tmux -CC
+
+claude --teammate-mode tmux

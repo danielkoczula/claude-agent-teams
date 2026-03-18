@@ -1,0 +1,15 @@
+@import './style';
+
+// Editor-specific overrides
+.wlc-portfolio-grid {
+	// Disable pointer events on filter buttons in editor (they're not functional)
+	&__filter-btn {
+		pointer-events: none;
+	}
+
+	// Disable pagination in editor
+	&__pagination {
+		pointer-events: none;
+		opacity: 0.5;
+	}
+}

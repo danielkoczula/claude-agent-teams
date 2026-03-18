@@ -1,0 +1,25 @@
+{
+  "env": {
+    "CLAUDE_CODE_EXPERIMENTAL_AGENT_TEAMS": "1"
+  },
+  "permissions": {
+    "allow": [
+      "mcp__plugin_figma_figma__get_metadata",
+      "mcp__plugin_figma_figma__get_variable_defs",
+      "mcp__plugin_figma_figma__generate_figma_design",
+      "Bash(open:*)",
+      "Bash(npx tsc:*)",
+      "mcp__plugin_figma_figma__get_design_context",
+      "mcp__plugin_figma_figma__get_screenshot",
+      "Bash(tmux new-session:*)",
+      "Bash(mkdir:*)",
+      "mcp__chrome-devtools__evaluate_script"
+    ]
+  },
+  "enabledMcpjsonServers": [
+    "Context7",
+    "chrome-devtools"
+  ],
+  "teammateMode": "tmux",
+  "defaultMode": "bypassPermissions" 
+}

@@ -27,127 +27,84 @@ Ask the user for a Figma URL before starting. Extract:
 - `fileKey` from the URL
 - `nodeId` (convert `-` to `:` in node IDs from URL query params)
 
----
+## MANDATORY: Agent Team Setup (do this BEFORE writing any files)
 
-## Agent Team Workflow
+**Always use a proper agent team with split terminal panes.** Never use background agents or write files directly in the lead session.
 
-### Phase 1 — Design Analysis (run Agent A in foreground)
+### Step 1 — Fetch design in parallel
+Call `get_design_context` and `get_variable_defs` simultaneously.
 
-**Agent A: Design Analyst**
+### Step 2 — Create the team
+```
+TeamCreate(team_name: "portfolio-grid-block", description: "Build wlc/block-name block")
+```
+This creates the team + shared task list. Teammates will open in split tmux panes automatically (configured in `.claude/settings.json`).
 
-Tasks:
-1. Call `get_variable_defs` with the fileKey to retrieve all design tokens (colors, spacing, typography, border)
-2. Call `get_design_context` with fileKey + nodeId to get the component spec and auto-generated code hints
-3. Call `get_screenshot` to capture the visual reference
-4. Analyze the design for interactive elements (filters, toggles, tabs, animations) — these require the Interactivity API
+### Step 2.5 — Decide: does this block need the Interactivity Router?
 
-Outputs (pass to Phase 2):
-- Complete token list mapped to `theme.json` preset format
-- Visual specification (component structure, states, responsive behavior)
-- Interactivity requirements: yes/no + list of interactive behaviors
-- Suggested block name (kebab-case, e.g. `portfolio-card`)
+Analyse the design before spawning agents. Use `@wordpress/interactivity-router` (and tell the js-agent and php-agent) **if the block has**:
+- Taxonomy / category filters that swap rendered content
+- Pagination without full page reload
+- Load-more pattern
 
----
+Skip the router if the block only needs show/hide, accordions, or modals (pure client state — use `data-wp-bind` / `data-wp-class` instead).
 
-### Phase 2 — Architecture (run Agent B in foreground, uses Phase 1 output)
+### Step 3 — Create tasks
+Use `TaskCreate` for each parallel workstream (one task per agent):
+- Task 1: PHP backend (plugin bootstrap, CPT, taxonomies, controller, render.php)
+- Task 2: JS frontend (block.json, package.json, index.js, edit.js, view.js — include router if decided above)
+- Task 3: CSS + config (style.scss, editor.scss, theme/theme.json)
 
-**Agent B: Block Architect**
+### Step 4 — Spawn 3 agents IN A SINGLE MESSAGE (parallel)
+Send all three `Agent` calls in the same response. Each agent **must** include:
+- `team_name: "portfolio-grid-block"` — joins the team and gets a tmux pane
+- `name: "php-agent"` / `"js-agent"` / `"css-agent"` — addressable by name
+- Full design spec in the prompt (conversation history is NOT shared with teammates)
 
-Tasks:
-1. Define `block.json` — name, title, description, category, icon, keywords
-2. Define all block attributes with types, defaults, and sources
-3. Decide supports (color, spacing, typography — only what design uses)
-4. Confirm whether `viewScriptModule` is needed (if Interactivity API required)
-5. Map design tokens to `theme.json` presets (use Phase 1 token list)
+```
+Agent(name: "php-agent",  team_name: "portfolio-grid-block", subagent_type: "general-purpose", ...)
+Agent(name: "js-agent",   team_name: "portfolio-grid-block", subagent_type: "general-purpose", ...)
+Agent(name: "css-agent",  team_name: "portfolio-grid-block", subagent_type: "general-purpose", ...)
+```
 
-Outputs:
-- Final `block.json` content
-- `theme.json` additions (new presets to add)
-- Attribute schema for use in `render.php` and `edit.js`
-
----
-
-### Phase 3 — Implementation (run Agents C and D in parallel)
-
-**Agent C: PHP + HTML Developer**
-
-Tasks:
-1. Create `src/blocks/{block-name}/render.php` — semantic HTML5, BEM classes, WCAG 2.1 AA
-2. Use `get_block_wrapper_attributes()` on the root element
-3. Pass server-side state via `wp_interactivity_state()` if Interactivity API is used
-4. Escape all output (`esc_html`, `esc_attr`, `esc_url`, `wp_kses_post`)
-5. Update `src/Services/BlockRegistrar.php` if needed
-
-Rules to follow (from CLAUDE.md):
-- Zero `border-radius`
-- Semantic elements (`<article>`, `<section>`, etc.)
-- Card link pattern: link on title, `aria-hidden="true"` on image
-- `defined('ABSPATH') || exit;` at top of every PHP file
-
-**Agent D: Frontend Developer** (runs in parallel with Agent C)
-
-Tasks:
-1. Create `scss/_variables.scss` — map theme.json tokens to SCSS variables using `var(--wp--preset--...)`
-2. Create `scss/_block.scss` — BEM styles, mobile-first, no utility classes, no hardcoded values
-3. Create `scss/style.scss` — frontend entry, imports _variables + _block
-4. Create `scss/editor.scss` — editor-only styles (if needed)
-5. Create `view.js` — Interactivity API store (only if Phase 1 identified interactive elements)
-6. Create `index.js` + `edit.js` — block registration and editor UI
-
-Rules to follow (from CLAUDE.md):
-- BEM prefix: `.wlc-{block-name}`
-- All values via `var(--wp--preset--...)` — no hardcoded colors/spacing
-- Interactivity API store namespace = `wlc/{block-name}`
-- Do not use `data-wp-ignore`
-
----
-
-### Phase 4 — QA Review (run Agent E in foreground, after C + D complete)
-
-**Agent E: QA / Accessibility Reviewer**
-
-Tasks:
-1. Read all generated files
-2. Check WCAG 2.1 AA:
-   - Alt text on all images
-   - Focus indicators on interactive elements
-   - ARIA labels where needed
-   - Color contrast (flag any color pairs that may be below 4.5:1)
-3. Check BEM naming consistency
-4. Check PHP: all output escaped, no hardcoded values
-5. Check SCSS: no raw hex/px values, correct BEM, mobile-first
-6. Check `block.json`: apiVersion 3, correct render/viewScriptModule paths
-7. Check Interactivity API: unique IDs, no `data-wp-ignore`, correct namespace
-
-Output:
-- List of issues with file + line references, or "All checks passed"
-- Fix any issues found directly
-
----
+### Step 5 — Wait and collect
+Wait for all 3 teammates to report completion via messages. Then:
+1. Send `shutdown_request` to each teammate (individually — cannot broadcast structured messages)
+2. Run `composer install && npm install && npm run build` in `plugins/wlc-blocks/`
 
 ## File Checklist
 
 After all agents complete, verify these files exist and are non-empty:
 
 ```
-plugins/wlc-blocks/src/blocks/{block-name}/
-├── block.json          ✓
-├── index.js            ✓
-├── edit.js             ✓
-├── render.php          ✓
-├── view.js             ✓ (if interactive)
-└── scss/
-    ├── _variables.scss ✓
-    ├── _block.scss     ✓
-    ├── style.scss      ✓
-    └── editor.scss     ✓
+plugins/wlc-blocks/
+├── resources/blocks/{block-name}/
+│   ├── block.json          ✓
+│   ├── index.js            ✓  (imports ./style.scss)
+│   ├── edit.js             ✓  (live preview + InspectorControls)
+│   ├── render.php          ✓  (template only, calls controller)
+│   ├── style.scss          ✓  (all BEM styles, var() directly)
+│   ├── editor.scss         ✓  (@import './style' + overrides)
+│   └── view.js             ✓  (if interactive)
+└── src/Services/Blocks/
+    └── {BlockName}Controller.php  ✓  (with docblocks)
 ```
 
-Also verify `theme.json` presets have been updated with new tokens.
+Also verify `theme/theme.json` presets have been updated with new tokens (font sizes in rem).
+
+## Pre-build verification
+
+Before building, verify `plugins/wlc-blocks/package.json` scripts include `--experimental-modules` in **both** `start` and `build` commands. This flag is required for `viewScriptModule` (`view.js`) to compile as an ES module.
 
 ## Post-build steps
 
 1. Run `npm run build` inside `plugins/wlc-blocks/`
 2. In WordPress Playground (http://localhost:9400), activate the plugin
 3. Create a new page, add the block, verify it renders correctly
-4. Check editor view matches design screenshot from Phase 1
+4. Check editor view: confirm live preview loads, InspectorControls are visible, Placeholder shows when no posts
+
+## CSS output filenames
+
+`@wordpress/scripts` produces these filenames — always use them in `block.json`:
+- `"editorStyle": "file:./index.css"` — compiled from `editor.scss` via `index.js`
+- `"style": "file:./style-index.css"` — compiled from `style.scss`
